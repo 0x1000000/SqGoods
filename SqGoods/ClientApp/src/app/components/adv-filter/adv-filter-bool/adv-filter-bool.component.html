@@ -1,0 +1,12 @@
+<ng-container *ngIf="andOrExpr != null">
+  <app-adv-filter-and-or 
+    [fields]="fields"
+    [(expr)]="andOrExpr">
+  </app-adv-filter-and-or>
+</ng-container>
+<ng-container *ngIf="predicate != null">
+  <app-adv-filter-predicate 
+    [fields]="fields"
+    [(predicate)]="predicate">
+  </app-adv-filter-predicate>
+</ng-container>

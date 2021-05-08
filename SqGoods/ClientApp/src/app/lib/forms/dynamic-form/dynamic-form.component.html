@@ -1,0 +1,47 @@
+<div [class.l-field-container]="isMultiCol">
+  <sq-dynamic-field 
+    *ngFor="let f of fields" 
+    [templateDirectives]="templates" 
+    [formField]="f"
+    [disabled]="actualDisabled"
+    [isVisited]="isVisited"
+    [(formObject)]="formObject"
+    [initialFormObject]="initialFormObject"
+    (tailButtonClick)="tailButtonClick.emit($event)">
+  </sq-dynamic-field>
+</div>
+<sq-text-field 
+  *sqDynamicFieldTemplate="'text'; let value;let fd=fieldData" 
+  [value]="value" 
+  [fieldData]="fd">
+</sq-text-field>
+
+<sq-numeric-field
+  *sqDynamicFieldTemplate="'numeric'; let value;let fd=fieldData" 
+  [value]="value" 
+  [fieldData]="fd">>
+</sq-numeric-field>
+
+<sq-select-static-field 
+  *sqDynamicFieldTemplate="'select-static'; let value;let fd=fieldData" 
+  [value]="value" 
+  [fieldData]="fd">
+</sq-select-static-field>
+
+
+<sq-bool-field 
+  *sqDynamicFieldTemplate="'bool'; let value;let fd=fieldData" 
+  [value]="value" 
+  [fieldData]="fd">
+</sq-bool-field>
+<style>
+  .l-field-container{
+    column-count: 2;
+    column-rule: 1px solid var(--sq-t-border-color);
+  }
+
+  sq-dynamic-field {
+    display: block;
+    break-inside: avoid-column;
+  }
+</style>

@@ -1,0 +1,21 @@
+<sq-tabs [selectedId]="selectedTabId" (linkClick)="onLinkClick($event)">
+  <sq-tabs-left-area>
+    <ng-content select="sq-tabs-left-area"></ng-content>
+  </sq-tabs-left-area>
+  <sq-tab-pane 
+    *ngFor="let t of tabs" 
+    [label]="t.label" 
+    [id]="t.href" 
+    [href]="t.href">
+  </sq-tab-pane>
+  <sq-tabs-right-area>
+    <ng-content select="sq-tabs-right-area"></ng-content>
+  </sq-tabs-right-area>
+</sq-tabs>
+<router-outlet (activate)="activatedComponent = $event"></router-outlet>
+<style>
+  sq-tabs{
+    display: block;
+    margin-bottom: 10px;;
+  }
+</style>

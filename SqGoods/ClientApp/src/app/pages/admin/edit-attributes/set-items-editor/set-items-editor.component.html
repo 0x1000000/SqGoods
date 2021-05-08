@@ -1,0 +1,28 @@
+<sq-modal-dialog 
+  [isOpen]="attributeId != null"
+  title="Edit Attribute Items" 
+  buttons="cancel-ok"
+  (buttonClick)="onDialogButtonClick($event)">
+
+  <sq-dynamic-form 
+    [fields]="fields"
+    [initialFormObject]="initialData"
+    [(formObject)]="currentData"
+    (tailButtonClick)="onTailButtonClick($event)"
+    [isVisited]="isVisited"
+    (isErrorChange)="isError = $event">
+  </sq-dynamic-form>
+
+  <button *ngIf="initialData != null" class="btn btn-primary l-add-btn" (click)="addNewItem()">
+    <svg class="icon">
+      <use xlink:href="#icon-add"></use>
+    </svg>
+    <span>Add New Item</span>
+  </button>
+
+</sq-modal-dialog>
+<style>
+  .l-add-btn{
+    margin-top: 20px;
+  }
+</style>

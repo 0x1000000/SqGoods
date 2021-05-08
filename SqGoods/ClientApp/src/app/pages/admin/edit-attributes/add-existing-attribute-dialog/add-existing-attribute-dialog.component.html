@@ -1,0 +1,16 @@
+<sq-modal-dialog 
+  [isOpen]="categoryId != null"
+  title="Add Existing Attributes" 
+  buttons="cancel-ok"
+  (buttonClick)="onDialogButtonClick($event)">
+  <div *ngFor="let i of items">
+    <sq-checkbox [checked]="selected.has(i.id)" (checkedChange)="onCheckedChange(i, $event)">
+      {{i.name}}
+    </sq-checkbox>  
+  </div>
+</sq-modal-dialog>
+<style>
+  .l-add-btn{
+    margin-top: 20px;
+  }
+</style>

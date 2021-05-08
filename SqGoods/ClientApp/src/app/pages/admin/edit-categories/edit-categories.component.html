@@ -1,0 +1,80 @@
+<table>
+  <tr>
+    <th>#</th>
+    <th>Category Name</th>
+    <th class="l-cell-center">Top Order</th>
+    <th class="l-cell-center">Attributes</th>
+    <th class="l-cell-center">Products</th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let c of categories">
+    <td class="l-cell-num">
+      {{c.order}}
+    </td>
+    <td class="l-cell-name">
+      {{c.name}}
+    </td>
+    <td class="l-cell-center">
+      <ng-container *ngIf="c.topOrder">{{c.topOrder}}</ng-container>
+      <span *ngIf="!c.topOrder" class="l-no-top">(not visible in top)</span>
+    </td>
+    <td>
+      <a [routerLink]="['/admin/attributes']" [queryParams]="{categoryId: c.id}">{{c.attributesCount}} attribute(s)</a>
+    </td>
+    <td>
+      <a [routerLink]="['/admin/products']" [queryParams]="{categoryId: c.id}">{{c.productCount}} product(s)</a>
+    </td>
+    <td class="l-cell-center">
+      <button class="btn btn-secondary" (click)="editingCategoryId=c.id" title="Edit Category">
+        <svg class="icon">
+          <use xlink:href="#icon-edit"></use>
+        </svg>
+      </button>
+      <button class="btn btn-secondary" (click)="deletingCategoryId=c.id" title="Delete Category">
+        <svg class="icon">
+          <use xlink:href="#icon-delete"></use>
+        </svg>
+      </button>
+    </td>
+  </tr>
+</table>
+<button class="btn btn-primary" (click)="onAdd()">
+  <svg class="icon">
+    <use xlink:href="#icon-add"></use>
+  </svg>
+  <span>
+    Add new category
+  </span>
+</button>
+<app-category-edit-dialog 
+  *ngIf="editingCategoryId != null"
+  [(categoryId)]="editingCategoryId"
+  (resultChange)="onEditCategoryResult($event)">
+</app-category-edit-dialog>
+<style>
+  table {
+    margin: 20px 0;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0 10px;
+  }
+  .l-cell-num {
+    font-weight: bold;
+    text-align: left;
+  }
+  .l-cell-name {
+    min-width: 150px;
+    max-width: 300px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+  .l-cell-center{
+    text-align: center;
+  }
+  .l-no-top{
+    font-style: italic;
+    font-size: 0.9rem;
+  }
+</style>

@@ -1,0 +1,16 @@
+from: 
+<input type="number" [value]="fromStr" (input)="onFromChange($event.target)">
+ to: 
+<input type="number"  [value]="toStr" (input)="onToChange($event.target)">
+<style>
+  :host{
+    display: inline-block;
+  }
+  :host>*{
+    vertical-align: middle;
+  }
+
+  input{
+    width: 70px;
+  }
+</style>

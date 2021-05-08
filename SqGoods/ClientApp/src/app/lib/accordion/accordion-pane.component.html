@@ -1,0 +1,40 @@
+<div class="sq-accordion-pane-tab disable-text-selection" [class.selected]="isSelected" [class.is-first]="isFirst" (click)="onTabClick()">
+  <ng-content select="sq-accordion-pane-label"></ng-content>
+</div>
+<div 
+  [@openClose]="animationState" 
+  (@openClose.done)="onAnimationDone()"
+  class="sq-accordion-pane-content">
+  <ng-content *ngIf="!isHidden" select="sq-accordion-pane-content"></ng-content>
+</div>
+
+<style>
+.sq-accordion-pane-tab{
+  padding: 10px;
+  font-size: 1.2rem;
+}
+
+.sq-accordion-pane-tab:not(.selected){
+  border-top: 1px solid var(--sq-t-border-color-hover);
+  cursor: pointer;
+}
+
+.sq-accordion-pane-tab:not(.selected):hover{
+  background-color: var(--sq-t-secondary-select-color);
+  transition: background-color .3s ease-in;
+}
+
+.sq-accordion-pane-tab.is-first{
+  border-top: 1px solid transparent;
+}
+
+.sq-accordion-pane-tab.selected{
+  border-top: 1px solid transparent;
+  border-right: 2px solid var(--sq-t-primary-select-color);
+  background-color: var(--sq-t-secondary-select-color);
+}
+
+.sq-accordion-pane-content{
+  overflow: hidden;
+}
+</style>

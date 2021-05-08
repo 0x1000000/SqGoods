@@ -1,0 +1,40 @@
+<div id="app-content-root">
+  <sq-app-progress-indicator></sq-app-progress-indicator>
+  <sq-app-router-tabs>
+    <sq-tabs-left-area>
+      <img id="logo" src="/assets/images/Logo.png"/>
+    </sq-tabs-left-area>
+    <sq-tabs-right-area>
+      <div id="user-profile-container">
+        <svg class="icon">
+          <use xlink:href="#icon-person-cycle"></use>
+        </svg>
+      </div>
+    </sq-tabs-right-area>
+  </sq-app-router-tabs>
+</div>
+<sq-app-popups></sq-app-popups>
+<style>
+
+  #main-tabs {
+    margin-bottom: 20px;
+
+  }
+  #logo{
+    vertical-align: middle;
+    margin-right: 20px;
+    margin-left: 5px;
+    height: 47px;
+  }
+
+  #user-profile-container{
+    float: right;
+    height: 50px;
+    margin-right: 10px;
+  }
+
+  #user-profile-container svg{
+    height: 50px;
+    width: 35px;
+  }
+</style>

@@ -1,0 +1,120 @@
+<div class="l-filter-box">
+  <div>Category Filter</div>  
+  <sq-drop-down-list 
+    [items]="categories" 
+    idMember="id" 
+    textMember="name" 
+    [(selected)]="selectedCategoryId"
+    [showNullSelection]="true"
+    [itemTemplate]="categoryFilterItem">
+  </sq-drop-down-list>
+  <ng-template #categoryFilterItem let-i let-text="text">
+    <span *ngIf="!i">{{text}}</span>
+    <span *ngIf="i" title="Number of Attributes">{{i.name}} <span class="l-filter-att-count">({{i.attributesCount}})</span></span>    
+  </ng-template>
+</div>
+<table>
+  <tr>
+    <th>Attribute Name</th>
+    <th>Type</th>
+    <th>Unit</th>
+    <th *ngIf="selectedCategoryId != null" class="l-cell-center">Order</th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let a of attributes">
+    <td class="l-cell-name">
+      <span *ngIf="a.mandatory" title="Mandatory" class="l-filter-att-count">*</span>
+      {{a.name}}
+      <span title="Number of Categories" class="l-filter-att-count">({{a.numberOfCategories}})</span>
+    </td>
+    <td class="l-cell-name">
+      {{getTypeText(a)}}
+      <span *ngIf="a.numberOfItems!=null" class="l-filter-att-count">({{a.numberOfItems}})</span>
+    </td>
+    <td class="l-cell-center">
+      {{a.unit}}
+    </td>
+    <td *ngIf="selectedCategoryId != null">
+      <button class="btn btn-action" (click)="onOrderUp(a)" [disabled]="isOrderUpVisible(a) ? undefined : true">
+        <svg class="icon">
+          <use xlink:href="#icon-arrow-up"></use>
+        </svg>
+      </button>
+      <button class="btn btn-action" (click)="onOrderDown(a)" [disabled]="isOrderDownVisible(a) ? undefined : true">
+        <svg class="icon">
+          <use xlink:href="#icon-arrow-down"></use>
+        </svg>
+      </button>
+    </td>
+    <td class="l-cell-center">
+      <button class="btn btn-secondary" (click)="editingAttributeId=a.id">
+        <svg class="icon">
+          <use xlink:href="#icon-edit"></use>
+        </svg>
+      </button>
+      <button class="btn btn-secondary" (click)="deletingAttributeId=a.id" title="Delete Attribute">
+        <svg class="icon">
+          <use xlink:href="#icon-delete"></use>
+        </svg>
+      </button>
+      <button *ngIf="isEditItemsVisible(a)" class="btn btn-secondary" (click)="editingSetItemAttributeId=a.id">
+        <svg class="icon">
+          <use xlink:href="#icon-list-circle"></use>
+        </svg>
+      </button>      
+    </td>    
+  </tr>
+</table>
+<button class="btn btn-primary" (click)="onAdd()">
+  <svg class="icon">
+    <use xlink:href="#icon-add"></use>
+  </svg>
+  <span>
+    Add new attribute
+  </span>
+</button>
+<button *ngIf="selectedCategoryId != null" class="btn btn-primary" (click)="onAddExisting()">
+  <svg class="icon">
+    <use xlink:href="#icon-add"></use>
+  </svg>
+  <span>
+    Add existing attributes
+  </span>
+</button>
+<app-attribute-edit-dialog 
+    *ngIf="editingAttributeId != null"
+    [(attributeId)]="editingAttributeId"
+    [categories]="categories"
+    [defaultCategoryId]="selectedCategoryId"
+    (resultChange)="onResult($event)">
+</app-attribute-edit-dialog>
+<app-set-items-editor
+  *ngIf="editingSetItemAttributeId != null"
+  [(attributeId)]="editingSetItemAttributeId"
+  (resultChange)="onResult($event)">
+</app-set-items-editor>
+<app-add-existing-attribute-dialog
+  *ngIf="addExistingCategoryId"
+  [(categoryId)]="addExistingCategoryId"
+  (resultChange)="onResult($event)"
+  >
+</app-add-existing-attribute-dialog>
+<style>
+  .l-filter-box{
+    margin: 10px 0;
+  }
+
+  .l-filter-att-count{
+    font-size: 0.8rem;
+    font-style: italic;
+    cursor: default;
+  }
+  table {
+    margin: 20px 0;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0 10px;
+  }  
+</style>

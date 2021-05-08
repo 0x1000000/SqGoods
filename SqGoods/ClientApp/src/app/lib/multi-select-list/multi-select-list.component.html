@@ -1,0 +1,15 @@
+<sq-checkbox *ngFor="let i of viewItems" [checked]="i.selected" (checkedChange)="onCheckedChange(i, $event)">
+  {{i.text}}
+</sq-checkbox>
+<style>
+    sq-checkbox{
+      display: block;
+      padding: 5px;
+      padding-bottom: 10px;
+    }
+
+    sq-checkbox:hover {
+      background-color: var(--sq-t-secondary-select-color);
+      color: var(--sq-t-secondary-select-color-opposite);
+    }
+</style>

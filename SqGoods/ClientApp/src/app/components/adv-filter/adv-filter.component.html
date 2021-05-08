@@ -1,0 +1,10 @@
+<sq-modal-dialog
+  *ngIf="isOpen"
+  [isOpen]="isOpen"
+  title="Filter" 
+  buttons="cancel-ok"
+  (buttonClick)="onButtonClick($event)">
+  
+  <app-adv-filter-and-or [fields]="fields" [(expr)]="internalExpr"></app-adv-filter-and-or>
+    
+</sq-modal-dialog>

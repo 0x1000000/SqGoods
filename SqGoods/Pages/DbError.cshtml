@@ -1,0 +1,11 @@
+﻿@page
+@model SqGoods.Pages.DbErrorModel
+@{
+}
+<h1>Database Engine - @Model.DataBaseType</h1>
+<h2>@Model.MainMessage</h2>
+
+@if (!string.IsNullOrEmpty(Model.ExceptionText))
+{
+    <pre>@Model.ExceptionText</pre>
+}

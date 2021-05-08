@@ -1,0 +1,87 @@
+<ng-container *ngIf="categories != null && categories.length>0">
+
+  <sq-drop-down-list 
+    [items]="categories" 
+    idMember="id" 
+    textMember="name" 
+    noneText="Select Category"
+    [(selected)]="selectedCategoryId">
+  </sq-drop-down-list>
+
+</ng-container>
+
+<div *ngIf="selectedCategoryId == null">
+  Select some category to see products list
+</div>
+
+<table *ngIf="selectedCategoryId != null">
+  <tr>
+    <th></th>
+    <th></th>
+  </tr>
+  <tr *ngFor="let p of products">
+    <td>
+      <div class="l-product-name">{{p.name}}</div>
+      <div>
+        <div *ngFor="let av of p.attributes" class="l-attribute">
+          <span class="l-attribute-name">{{av.name}}:</span>
+          <span  class="l-attribute-value">{{av.value}}</span>
+        </div>
+      </div>
+    </td>
+    <td>
+      <button class="btn btn-secondary" (click)="onEdit(p.id)">
+        <svg class="icon">
+          <use xlink:href="#icon-edit"></use>
+        </svg>
+      </button>      
+    </td>
+  </tr>
+</table>
+
+<button *ngIf="selectedCategoryId != null" class="btn btn-primary" (click)="onAdd()">
+  <svg class="icon">
+    <use xlink:href="#icon-add"></use>
+  </svg>
+  <span>
+    Add new Product
+  </span>
+</button>
+
+<app-edit-product-dialog
+  *ngIf="productId != null"
+  [(productId)]="productId"
+  [categoryId]="selectedCategoryId"
+  (resultChange)="onResult($event)">
+
+</app-edit-product-dialog>
+
+<style>
+  table {
+    margin: 20px 0;
+  }
+
+  th, td {
+    text-align: left;
+    padding: 0 10px;
+  }  
+
+  .l-product-name {
+    font-size: 1.3rem;
+    font-weight: bold;
+  }
+
+  .l-attribute {
+    margin-left: 10px;
+  }
+
+  .l-attribute-name {
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  .l-attribute-value {
+    font-weight: bold;
+    margin-left: 5px;
+  }
+</style>

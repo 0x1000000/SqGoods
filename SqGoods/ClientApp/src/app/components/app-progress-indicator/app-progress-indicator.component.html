@@ -1,0 +1,45 @@
+<ng-container *ngIf="visible">
+  <div class="line"></div>
+  <div class="subline inc"></div>
+  <div class="subline dec"></div>
+</ng-container>
+<style>
+  :host{
+    display: block;
+    position: fixed;
+    height: 3px;
+    top: 0;
+    left: 0;
+    right: 0;
+    overflow-x: hidden;
+  }
+
+  .line{
+    position:absolute;
+    opacity: 0.4;
+    background:var(--sq-t-primary-select-color);
+    width:150%;
+    height:3px;
+  }
+
+  .subline{
+    position:absolute;
+    background:var(--sq-t-primary-select-color);
+    height:3px; 
+  }
+  .inc{
+   animation: increase 2s infinite;
+  }
+  .dec{
+   animation: decrease 2s 0.5s infinite;
+  }
+
+  @keyframes increase {
+   from { left: -5%; width: 5%; }
+   to { left: 130%; width: 100%;}
+  }
+  @keyframes decrease {
+   from { left: -80%; width: 80%; }
+   to { left: 110%; width: 10%;}
+  }  
+</style>

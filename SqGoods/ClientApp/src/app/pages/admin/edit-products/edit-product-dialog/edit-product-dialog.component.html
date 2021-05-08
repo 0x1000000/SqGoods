@@ -1,0 +1,15 @@
+<sq-modal-dialog 
+  [isOpen]="isOpen"
+  title="Edit Product" 
+  buttons="cancel-ok" 
+  (buttonClick)="onButtonClick($event)"
+>
+  <sq-dynamic-form 
+    *ngIf="fields != null"
+    [fields]="fields"
+    [initialFormObject]="initialFormData"
+    [(formObject)]="formData"
+    [isVisited]="isVisited"
+    (isErrorChange)="onFormError($event)">
+  </sq-dynamic-form>
+</sq-modal-dialog>

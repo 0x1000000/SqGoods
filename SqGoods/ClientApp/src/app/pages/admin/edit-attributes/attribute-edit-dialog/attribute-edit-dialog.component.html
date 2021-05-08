@@ -1,0 +1,17 @@
+<sq-modal-dialog
+  [isOpen]="attributeId != null"
+  title="Edit Attribute" 
+  buttons="cancel-ok"
+  (buttonClick)="onDialogButtonClick($event)">
+
+  <sq-dynamic-form 
+    *ngIf="attributeId != null"
+    [fields]="fields"
+    [initialFormObject]="initialAttributeData"
+    [disabled]="attributeData == null"
+    [(formObject)]="attributeData"
+    [isVisited]="isVisited"
+    (isErrorChange)="onFormError($event)">
+  </sq-dynamic-form>
+
+</sq-modal-dialog>

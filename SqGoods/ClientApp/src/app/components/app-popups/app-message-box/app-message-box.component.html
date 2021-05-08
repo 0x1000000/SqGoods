@@ -1,0 +1,16 @@
+<sq-modal-dialog 
+  *ngIf="currentMessageBox != null"
+  [isOpen]="true"
+  title="" 
+  [buttons]="currentMessageBox.data.buttons" 
+  (buttonClick)="onDialogButtonClick($event)">
+  <div class="l-message-container" *ngIf="currentMessageBox != null">
+    {{currentMessageBox.data.text}}
+  </div>
+</sq-modal-dialog>
+<style>
+  .l-message-container{
+    text-align: center;
+    font-size: 1.4rem;
+  }
+</style>

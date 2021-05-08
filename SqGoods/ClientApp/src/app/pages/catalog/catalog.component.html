@@ -1,0 +1,66 @@
+<sq-tabs [(selectedId)]="selectedCategoryId">
+  <sq-tab-pane *ngFor="let i of categories" [label]="i.name" [id]="i.id">
+  </sq-tab-pane>
+
+  <button *ngIf="fields != null" class="btn btn-secondary l-filter-btn" (click)="isFilterOpen = true">
+    Filter
+    <div *ngIf="filterNodeCounter>0" class="l-filter-node-counter">
+      {{filterNodeCounter}} predicate(s)
+    </div>
+  </button>
+
+  <div *ngFor="let p of products">
+    <h2>{{p.name}}</h2>
+    <div>
+      <img [attr.src]="p.coverUrl" class="l-cover">
+      <div class="l-attributes-pane">
+        <div *ngFor="let a of p.attributes">
+          <span class="l-attribute-name">{{a.name}}</span>:<span class="l-attribute-value">{{a.value}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</sq-tabs>
+<app-adv-filter 
+  [(isOpen)]="isFilterOpen"
+  [fields]="fields"
+  [(expr)]="filterExpr">
+</app-adv-filter>
+<style>
+  .l-cover{
+    width: 200px;    
+  }
+  
+  .l-attributes-pane{
+    display: inline-block;
+    vertical-align: top;
+  }
+
+  .l-attribute-name{
+    font-size: 0.9rem;
+    font-style: italic;
+  }
+
+  .l-attribute-value{
+    font-weight: bold;
+    margin-left: 10px;
+  }
+
+  .l-filter-btn{
+    margin-top: 20px;
+  }
+
+  .l-filter-node-counter{
+    background-color: var(--sq-t-primary-select-color);
+    color: var(--sq-t-primary-select-color-opposite);
+    border-radius: 2rem;
+    padding: 5px;
+    font-size: 0.8rem;
+  }
+
+  .l-filter-btn:hover .l-filter-node-counter{
+    background-color: var(--sq-t-primary-select-color-hover);
+  }
+
+
+</style>

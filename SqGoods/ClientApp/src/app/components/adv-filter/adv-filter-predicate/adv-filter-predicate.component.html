@@ -1,0 +1,39 @@
+<sq-drop-down-list 
+  [(selected)]="selectedField" 
+  [items]="fields" 
+  textMember="label"
+  [isError]="isEmpty">
+</sq-drop-down-list>
+
+<ng-container *ngIf="descriptor.select != null">
+  <sq-drop-down-list [items]="descriptor.select.items" [multi]="descriptor.select.multi" [(selected)]="value" idMember="id" textMember="title">    
+  </sq-drop-down-list>
+</ng-container>
+
+<ng-container *ngIf="descriptor.num != null">
+  <app-num-range [(value)]="value"></app-num-range>
+</ng-container>
+
+<ng-container *ngIf="descriptor.bool != null">
+  <sq-drop-down-list [items]="boolItems" [(selected)]="value" idMember="value" textMember="title">
+  </sq-drop-down-list>
+</ng-container>
+
+<style>
+  :host{
+    display: block;
+    white-space: nowrap;
+  }
+
+  :host>*{
+    vertical-align: top;
+  }
+
+  sq-drop-down-list+sq-drop-down-list{
+    margin-left: 18px;
+  }
+
+  app-num-range{
+    margin-left: 10px;
+  }
+</style>

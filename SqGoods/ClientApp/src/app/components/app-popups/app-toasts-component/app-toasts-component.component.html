@@ -1,0 +1,50 @@
+<div *sqPopupRect="true,top:50, right: 0">
+
+  <div
+    *ngFor="let t of toastMessages"
+    #el
+    class="l-toast-box"
+    [class.l-toast-box-error]="t.type === 'error'"
+    life-cycle
+    (onInit)="onToastCreated(el, t)"
+    (onDestroy)="onToastDestroyed(el, t)"    
+    [style.top.px]="getTop(t)">    
+    {{t.text}}
+  </div>
+</div>
+
+<style>
+
+  .l-toast-box {
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin: 20px;
+    padding: 10px;
+    opacity: 0.9;
+    transform: translateX();
+    transition: top 0.2s;    
+    animation: appear 0.8s;
+    max-width: 300px;
+    max-height: 100px;
+    white-space: normal;
+    width: max-content;
+    text-overflow: ellipsis;
+    overflow-y: auto;
+    border-radius: .25rem;
+
+    background-color: var(--sq-t-primary-select-color);
+    color: var(--sq-t-primary-select-color-opposite);
+  }
+
+  .l-toast-box-error {
+    background-color: var(--sq-t-error-color);
+    color: var(--sq-t-error-color-opposite);
+    box-shadow: var(--sq-t-secondary-select-box-shadow);
+  }
+
+  @keyframes appear {
+    from {opacity: 0;}
+    to {opacity: 0.9;}
+  }
+</style>

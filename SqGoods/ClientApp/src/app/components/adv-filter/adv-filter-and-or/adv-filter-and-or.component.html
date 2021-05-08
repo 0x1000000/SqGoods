@@ -1,0 +1,79 @@
+<div class="l-op">
+  <button class="btn btn-secondary l-op-button" *ngIf="!isOr && items.length>1" (click)="isOr = true">
+    AND
+  </button>
+  <button class="btn btn-secondary l-op-button" *ngIf="isOr && items.length>1"  (click)="isOr = false">
+    OR
+  </button>
+</div>
+<div class="l-items" [class.l-items-or]="isOr">
+  <div *ngFor="let i of items;index as index;trackBy: trackByIndex" class="l-item">
+    <button class="btn btn-action" (click)="onRemoveClick(i, index)">
+      <svg class="icon">
+        <use xlink:href="#icon-remove-circle"></use>
+      </svg>
+    </button>  
+    <app-adv-filter-bool [fields]="fields" [expr]="i" (exprChange)="onItemChange($event, index)">
+    </app-adv-filter-bool>
+    <button class="btn btn-action" *ngIf="isToSubVisible(i)" (click)="toSub(i, index)">
+      <svg class="icon">
+        <use xlink:href="#icon-arrow-forward-circle"></use>
+      </svg>
+    </button>      
+    <button class="btn btn-action" *ngIf="isFromSubVisible(i)" (click)="fromSub(i, index)">
+      <svg class="icon">
+        <use xlink:href="#icon-arrow-backward-circle"></use>
+      </svg>
+    </button>
+    <svg class="icon l-icon-alert" *ngIf="isAlertVisible(i)">
+      <use xlink:href="#icon-alert-circle"></use>
+    </svg>
+  </div>
+  <button class="btn btn-primary" (click)="onAddClick()" [disabled]="isAddDisabled ? true : undefined">
+    Add
+  </button>
+</div>
+<style>
+  :host{
+    display: table;
+  }
+
+  :host>*{
+    display: table-cell;
+    vertical-align: middle;
+  }
+
+  .l-op-button{
+    width: 70px;
+  }
+
+  .l-op{
+    padding: 10px;
+  }
+  
+  .l-items{
+    border-left: 3px solid var(--sq-t-border-color);
+    padding: 10px;    
+  }
+
+  .l-items-or{
+    border-left-style: dashed;
+  }
+
+  .l-item{
+    margin-bottom: 10px;
+    white-space: nowrap;
+  }
+
+  .l-item>*{
+    display: inline-block;
+    vertical-align: middle;
+    
+  }
+
+  .l-icon-alert{
+    fill: var(--sq-t-error-color);
+    stroke: var(--sq-t-error-color);
+    margin-left: 3px;
+  }
+</style>

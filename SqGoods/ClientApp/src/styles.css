@@ -1,0 +1,192 @@
+/* You can add global styles to this file, and also import other style files */
+body {
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--sq-t-color-opposite);
+  background-color: var(--sq-t-color);
+  text-align: left;
+}
+
+a *{
+  color: initial;
+}
+
+#app-content-root{
+  max-width: 1200px;
+  text-align: initial;
+  margin: auto;
+}
+
+.disable-text-selection {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.tab-link{
+  display: block;
+  text-decoration: initial;
+  height: 50px;
+  padding: 0 10px;
+}
+.tab-link:visited{
+  color: initial;
+}
+
+/*Theme*/
+
+/*
+#757de8
+#3f51b5
+*/
+
+:root {
+  --sq-t-color: white;
+  --sq-t-color-opposite: #212529;
+
+  --sq-t-primary-select-color: #3f51b5;
+  --sq-t-primary-select-color-hover: #465aca;
+  --sq-t-primary-select-color-opposite: white;
+  --sq-t-primary-select-box-shadow: 0px 0px 3px 2px #3f51b5aa;
+
+  --sq-t-secondary-select-color: #f2f2f2;
+  --sq-t-secondary-select-color-hover: #f7f7f7;
+  --sq-t-secondary-select-color-opposite: #212529;
+  --sq-t-secondary-select-box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.1);
+
+  --sq-t-error-color: #dc3545;
+  --sq-t-error-color-opposite: white;
+  --sq-t-error-box-shadow: 0px 0px 3px 2px #dc35453A;
+
+  --sq-t-disabled-color: #f7f7f7;
+  --sq-t-disabled-color-opposite: #999;
+
+  --sq-t-border-color: #999;
+  --sq-t-border-color-hover: #d9d9d9;
+}
+
+.icon{
+  fill: var(--sq-t-color-opposite);
+  stroke: var(--sq-t-color-opposite);
+  height: 25px;
+  width: 25px;
+}
+
+.btn {
+  display: inline-block;
+  font-weight: 400;
+  line-height: 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  vertical-align: middle;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  background-color: transparent;
+  border: 1px solid transparent;
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  border-radius: .25rem;
+  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+.btn + .btn{
+  margin-left: 5px;
+}
+.btn *{
+  vertical-align: middle;
+}
+
+.btn:hover {
+  background-color: var(--sq-t-secondary-select-color-hover);
+}
+
+.btn:focus{
+  box-shadow: var(--sq-t-secondary-select-box-shadow);
+  outline: 0;
+}
+
+
+.btn-primary {
+  background-color: var(--sq-t-primary-select-color);
+  color: var(--sq-t-primary-select-color-opposite);
+}
+
+.btn-primary:hover{
+  background-color: var(--sq-t-primary-select-color-hover);
+}
+
+.btn-primary:focus{
+  box-shadow: var(--sq-t-primary-select-box-shadow);  
+}
+
+.btn-primary svg{
+  fill: var(--sq-t-primary-select-color-opposite);
+  stroke: var(--sq-t-primary-select-color-opposite);
+  height: 1.5rem;
+  width: 1.5rem;
+  vertical-align: top;
+}
+
+.btn-secondary {
+  background-color: var(--sq-t-secondary-select-color);
+  color: var(--sq-t-secondary-select-color-opposite);
+}
+
+.btn-secondary svg{
+  fill: var(--sq-t-secondary-select-color-opposite);
+  stroke: var(--sq-t-secondary-select-color-opposite);
+  height: 1.5rem;
+  width: 1.5rem;
+  vertical-align: top;
+}
+
+.btn-action {
+  border-radius: 1rem;
+  padding: .15rem;
+}
+
+button:disabled,button:disabled:hover{
+  background-color: var(--sq-t-disabled-color);
+  color: var(--sq-t-disabled-color-opposite);
+  cursor: default;
+}
+
+input{
+  display: inline-block;
+  padding: .375rem;
+  width: 250px;
+  font-size: 1rem;
+  line-height: 1.5rem;
+  background-color: var(--sq-t-color);
+  color: var(--sq-t-color-opposite);
+  background-clip: padding-box;
+  box-sizing:border-box;
+  border: 1px solid var(--sq-t-border-color);
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+input:focus {
+  border-color: var(--sq-t-border-color);
+  outline: 0;
+  box-shadow: var(--sq-t-secondary-select-box-shadow);
+}
+
+input.error {
+  border-color: var(--sq-t-error-color);
+}
+
+input:disabled{
+  background-color: var(--sq-t-disabled-color);
+  color: var(--sq-t-disabled-color-opposite);
+}
+
+input.error:focus{
+  box-shadow: var(--sq-t-error-box-shadow);
+}

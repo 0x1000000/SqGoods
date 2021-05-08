@@ -1,0 +1,16 @@
+<sq-modal-dialog 
+  [isOpen]="categoryId != null"
+  title="Edit Category" 
+  buttons="cancel-ok" 
+  (buttonClick)="onDialogButtonClick($event)">
+
+  <sq-dynamic-form 
+    [fields]="fields"
+    [initialFormObject]="initialCategoryData"
+    [disabled]="categoryData == null"
+    [(formObject)]="categoryData"
+    [isVisited]="isVisited"
+    (isErrorChange)="onFormError($event)">
+  </sq-dynamic-form>
+  
+</sq-modal-dialog>
