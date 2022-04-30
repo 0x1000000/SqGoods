@@ -13,6 +13,6 @@
     <PackageReference Include="MySql.Data" Version="8.0.27" />
     <PackageReference Include="Npgsql" Version="5.0.4" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.2" />
-    <PackageReference Include="SqExpress" Version="0.3.1" />
+    <PackageReference Include="SqExpress" Version="0.3.2" />
   </ItemGroup>
 </Project>
