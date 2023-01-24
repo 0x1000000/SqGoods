@@ -1,13 +1,16 @@
 import { Component, ChangeDetectionStrategy, HostBinding, HostListener, Input, Output, EventEmitter } from '@angular/core';
-import { Calc, StateTracking } from 'ng-set-state';
+import { Calc, initializeStateTracking } from 'ng-set-state';
 
 @Component({
     selector: 'sq-checkbox',
     changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './checkbox.component.html'
 })
-@StateTracking({immediateEvaluation: true})
 export class CheckboxComponent {
+
+    constructor() {
+        initializeStateTracking<CheckboxComponent>(this, { immediateEvaluation: true });
+    }
 
     @Input()
     public checked = false;

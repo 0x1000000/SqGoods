@@ -1,4 +1,4 @@
-﻿using MySql.Data.MySqlClient;
+﻿using MySqlConnector;
 using SqExpress.DataAccess;
 using SqExpress.SqlExport;
 
@@ -19,7 +19,7 @@ namespace SqGoods.DomainLogic.DataAccess
         {
             return new SqDatabase<MySqlConnection>(
                 connection: this._connection,
-                commandFactory: (conn, sql) => new MySqlCommand(cmdText: sql, connection: conn),
+                commandFactory: (conn, sql) => new MySqlCommand(commandText: sql, connection: conn),
                 sqlExporter: PgSqlExporter);
         }
 

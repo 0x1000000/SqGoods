@@ -125,7 +125,7 @@ export class FormFieldsBuilder<T> {
         index = this._formFields.findIndex(f => f.descriptor.id === id);
       }
       if (index < 0){
-        throw new Error(`Could not find field '${id}'`);
+        throw new Error(`Could not find field '${id?.toString()}'`);
       }
       return this._formFields[index];
     }

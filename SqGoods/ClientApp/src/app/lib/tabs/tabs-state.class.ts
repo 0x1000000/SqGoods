@@ -1,8 +1,11 @@
-import { StateTracking } from 'ng-set-state';
+import { initializeStateTracking } from 'ng-set-state';
 import { TabPaneComponent } from './tab-pane.component';
 
-@StateTracking({includeAllPredefinedFields: true})
 export class TabsState{
+
+  constructor() {
+    initializeStateTracking<TabsState>(this, { includeAllPredefinedFields: true });
+  }
 
   selectedPane: TabPaneComponent|null = null;
 
