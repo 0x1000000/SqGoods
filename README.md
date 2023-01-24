@@ -6,7 +6,7 @@ SqGoods it is a catalog of products with dynamic attributes.
 The key feature is a complex filtering (any kind of boolean expressions) using the dynamic attributes. 
 
 ## Prerequisites
-- [.Net 5 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/5.0)
+- [.Net 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
 - NodeJS
 - MSSQL or MYSQL or PostgreSQL server (you will need to create an empty database)
 ## Configuration
