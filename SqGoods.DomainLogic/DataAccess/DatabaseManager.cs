@@ -79,51 +79,21 @@ namespace SqGoods.DomainLogic.DataAccess
                 
                 using var database = cs.CreateDatabase();
 
-                var tables = AllTables.BuildAllTableList();
+                var declaredTables = AllTables.BuildAllTableList();
 
-                foreach (var table in tables.Reverse())
+                var actualTables = await database.GetTables();
+
+                var comparison = declaredTables.CompareWith(actualTables);
+
+                if (comparison != null &&
+                    (comparison.MissedTables is { Count: > 0 } || comparison.DifferentTables is { Count: > 0 }))
                 {
-                    try
+                    var initializationError = await RecreateTables(database, declaredTables);
+                    if (initializationError != null)
                     {
-                        await database.Statement(table.Script.DropIfExist());
-                    }
-                    catch (Exception e)
-                    {
-                        this.LastError = new InitializationError(
-                            InitializationError.InitializationErrorCode.Recreation,
-                            $"Dropping {table.FullName.AsExprTableFullName().TableName.Name}",
-                            e);
+                        this.LastError = initializationError;
                         return this.LastError;
                     }
-                }
-
-                foreach (var table in tables)
-                {
-                    try
-                    {
-                        await database.Statement(table.Script.Create());
-                    }
-                    catch (Exception e)
-                    {
-                        this.LastError = new InitializationError(
-                            InitializationError.InitializationErrorCode.Recreation,
-                            $"Creating {table.FullName.AsExprTableFullName().TableName.Name}",
-                            e);
-                        return this.LastError;
-                    }
-                }
-
-                try
-                {
-                    await InsertInitialData(database, tables);
-                }
-                catch (Exception e)
-                {
-                    this.LastError = new InitializationError(
-                        InitializationError.InitializationErrorCode.InitDataInsertion,
-                        null,
-                        e);
-                    return this.LastError;
                 }
 
                 this.IsInitialized = true;
@@ -187,7 +157,55 @@ namespace SqGoods.DomainLogic.DataAccess
             }
         }
 
-        private static async Task InsertInitialData(ISqDatabase database, TableBase[] tableBases)
+
+        private static async Task<InitializationError?> RecreateTables(ISqDatabase database, IReadOnlyList<TableBase> tables)
+        {
+            foreach (var table in tables.Reverse())
+            {
+                try
+                {
+                    await database.Statement(table.Script.DropIfExist());
+                }
+                catch (Exception e)
+                {
+                    return new InitializationError(
+                        InitializationError.InitializationErrorCode.Recreation,
+                        $"Dropping {table.FullName.AsExprTableFullName().TableName.Name}",
+                        e);
+                }
+            }
+
+            foreach (var table in tables)
+            {
+                try
+                {
+                    await database.Statement(table.Script.Create());
+                }
+                catch (Exception e)
+                {
+                    return new InitializationError(
+                        InitializationError.InitializationErrorCode.Recreation,
+                        $"Creating {table.FullName.AsExprTableFullName().TableName.Name}",
+                        e);
+                }
+            }
+
+            try
+            {
+                await InsertInitialData(database, tables);
+            }
+            catch (Exception e)
+            {
+                return new InitializationError(
+                    InitializationError.InitializationErrorCode.InitDataInsertion,
+                    null,
+                    e);
+            }
+
+            return null;
+        }
+
+        private static async Task InsertInitialData(ISqDatabase database, IReadOnlyList<TableBase> tableBases)
         {
             var document = JsonDocument.Parse(InitialData.Json);
 

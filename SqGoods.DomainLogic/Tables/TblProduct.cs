@@ -13,7 +13,7 @@ namespace SqGoods.DomainLogic.Tables
             this.ProductId = this.CreateGuidColumn("ProductId", ColumnMeta.PrimaryKey());
             this.CategoryId = this.CreateGuidColumn("CategoryId", ColumnMeta.ForeignKey<TblCategory>(t => t.CategoryId));
             this.Name = this.CreateStringColumn(name: "Name", size: 255, isUnicode: true, isText: false, columnMeta: null);
-            this.CoverUrl = this.CreateStringColumn(name: "CoverUrl", size: null, isUnicode: true, isText: false, columnMeta: null);
+            this.CoverUrl = this.CreateStringColumn(name: "CoverUrl", size: 2048, isUnicode: true, isText: false, columnMeta: null);
         }
 
         [SqModel("SgProduct")]

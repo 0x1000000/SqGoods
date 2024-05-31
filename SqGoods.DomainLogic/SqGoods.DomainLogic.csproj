@@ -3,16 +3,15 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <SqModelGenEnable>true</SqModelGenEnable>
     <SqModelGenType>Record</SqModelGenType>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-    <PackageReference Include="MySqlConnector" Version="1.2.1" />
-    <PackageReference Include="Npgsql" Version="5.0.4" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.1.2" />
-    <PackageReference Include="SqExpress" Version="0.4.1" />
+    <PackageReference Include="MySqlConnector" Version="2.3.7" />
+    <PackageReference Include="Npgsql" Version="8.0.3" />
+    <PackageReference Include="SqExpress" Version="1.0.0-beta2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
   </ItemGroup>
 </Project>

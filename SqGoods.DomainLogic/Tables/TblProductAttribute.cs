@@ -12,7 +12,7 @@ namespace SqGoods.DomainLogic.Tables
         {
             this.ProductId = this.CreateGuidColumn("ProductId", ColumnMeta.PrimaryKey().ForeignKey<TblProduct>(t=>t.ProductId));
             this.AttributeId = this.CreateGuidColumn("AttributeId", ColumnMeta.PrimaryKey().ForeignKey<TblAttribute>(t => t.AttributeId));
-            this.StringValue  = this.CreateNullableStringColumn("StringValue", null, isUnicode: true);
+            this.StringValue  = this.CreateNullableStringColumn("StringValue", 2048, isUnicode: true);
             this.IntValue = this.CreateNullableInt32Column("IntValue");
             this.BoolValue = this.CreateNullableBooleanColumn("BoolValue");
             this.SelectValue = this.CreateNullableGuidColumn("GuidValue");
