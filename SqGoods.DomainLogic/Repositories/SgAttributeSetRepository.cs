@@ -56,28 +56,33 @@ namespace SqGoods.DomainLogic.Repositories
             var tProductAttributeSet = AllTables.GetProductAttributeSet();
             var tAttributeSet = AllTables.GetAttributeSet();
 
-            using var tran = this._database.BeginTransactionOrUseExisting(out _);
+            var (tran, _) = await this._database.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
 
-            await SqQueryBuilder
-                .Delete(tProductAttributeSet)
-                .From(tProductAttributeSet)
-                .InnerJoin(tAttributeSet, on: tAttributeSet.AttributeSetId == tProductAttributeSet.AttributeSetId)
-                .Where(tAttributeSet.AttributeId.In(allAttributes) &
-                       !tProductAttributeSet.AttributeSetId.In(attributesItems.Select(i => i.AttributeSetId).ToList()))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tProductAttributeSet)
+                    .From(tProductAttributeSet)
+                    .InnerJoin(tAttributeSet, on: tAttributeSet.AttributeSetId == tProductAttributeSet.AttributeSetId)
+                    .Where(
+                        tAttributeSet.AttributeId.In(allAttributes) &
+                        !tProductAttributeSet.AttributeSetId.In(attributesItems.Select(i => i.AttributeSetId).ToList())
+                    )
+                    .Exec(this._database);
 
 
-            await SqQueryBuilder
-                .MergeDataInto(AllTables.GetAttributeSet(), attributesItems)
-                .MapDataKeys(SgAttributeItem.GetUpdateKeyMapping)
-                .MapData(SgAttributeItem.GetUpdateMapping)
-                .WhenMatchedThenUpdate()
-                .WhenNotMatchedByTargetThenInsert()
-                .WhenNotMatchedBySourceThenDelete(t => t.AttributeId.In(allAttributes))
-                .Done()
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .MergeDataInto(AllTables.GetAttributeSet(), attributesItems)
+                    .MapDataKeys(SgAttributeItem.GetUpdateKeyMapping)
+                    .MapData(SgAttributeItem.GetUpdateMapping)
+                    .WhenMatchedThenUpdate()
+                    .WhenNotMatchedByTargetThenInsert()
+                    .WhenNotMatchedBySourceThenDelete(t => t.AttributeId.In(allAttributes))
+                    .Done()
+                    .Exec(this._database);
 
-            tran.Commit();
+                await tran.CommitAsync();
+            }
         }
     }
 }

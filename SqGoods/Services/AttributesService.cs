@@ -129,38 +129,52 @@ namespace SqGoods.Services
 
         public async Task Create(IReadOnlyList<AttributeCreateModel> createModel)
         {
-            using var transaction = this._domain.Db.BeginTransaction();
+            var (tran, _) = await this._domain.Db.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
 
-            var attrs = createModel.SelectReadOnlyList(i => new SgAttribute(Guid.NewGuid(), i.Name, i.Type, i.Unit));
+                var attrs = createModel.SelectReadOnlyList(i => new SgAttribute(Guid.NewGuid(), i.Name, i.Type, i.Unit));
 
-            await this._domain.Attribute.Create(attrs);
+                await this._domain.Attribute.Create(attrs);
 
-            var attrCat = attrs
-                .Zip(createModel, (attr, cModel) => (attr, cModel))
-                .SelectMany(t => t.cModel.Categories!.Select(cat => new SgCategoryAttributeMandatory(cat,t.attr.Id, t.cModel.Mandatory)))
-                .ToList();
+                var attrCat = attrs
+                    .Zip(createModel, (attr, cModel) => (attr, cModel))
+                    .SelectMany(
+                        t => t.cModel.Categories!.Select(
+                            cat => new SgCategoryAttributeMandatory(cat, t.attr.Id, t.cModel.Mandatory)
+                        )
+                    )
+                    .ToList();
 
-            await this._domain.CategoryAttribute.Create(attrCat);
+                await this._domain.CategoryAttribute.Create(attrCat);
 
-            transaction.Commit();
+                await tran.CommitAsync();
+            }
         }
 
         public async Task Update(IReadOnlyList<AttributeUpdateModel> createModel)
         {
-            using var transaction = this._domain.Db.BeginTransaction();
+            var (tran, _) = await this._domain.Db.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
 
-            var attrs = createModel.SelectReadOnlyList(i => new SgAttribute(i.Id, i.Name, i.Type, i.Unit));
+                var attrs = createModel.SelectReadOnlyList(i => new SgAttribute(i.Id, i.Name, i.Type, i.Unit));
 
-            await this._domain.Attribute.Update(attrs);
+                await this._domain.Attribute.Update(attrs);
 
-            var attrCat = attrs
-                .Zip(createModel, (attr, cModel) => (attr, cModel))
-                .SelectMany(t => t.cModel.Categories!.Select(cat => new SgCategoryAttributeMandatory(cat,t.attr.Id, t.cModel.Mandatory)))
-                .ToList();
+                var attrCat = attrs
+                    .Zip(createModel, (attr, cModel) => (attr, cModel))
+                    .SelectMany(
+                        t => t.cModel.Categories!.Select(
+                            cat => new SgCategoryAttributeMandatory(cat, t.attr.Id, t.cModel.Mandatory)
+                        )
+                    )
+                    .ToList();
 
-            await this._domain.CategoryAttribute.Merge(attrCat);
+                await this._domain.CategoryAttribute.Merge(attrCat);
 
-            transaction.Commit();
+                await tran.CommitAsync();
+            }
         }
 
         public async Task Delete(IReadOnlyList<Guid> attributes)
@@ -186,28 +200,33 @@ namespace SqGoods.Services
 
         public async Task<IServiceResponse> UpdateItems(Guid attributeId, IReadOnlyList<AttributeItemModel> items)
         {
-            using var tran = this._domain.Db.BeginTransactionOrUseExisting(out _);
-
-            var error = await this.CheckSetAttribute(attributeId: attributeId);
-            if (error != null)
+            var (tran, _) = await this._domain.Db.BeginTransactionOrUseExistingAsync();
+            await using (tran)
             {
-                return ServiceResponse.Error(error);
-            }
+                var error = await this.CheckSetAttribute(attributeId: attributeId);
+                if (error != null)
+                {
+                    return ServiceResponse.Error(error);
+                }
 
-            if (items.Count < 1)
-            {
-                await this._domain
-                    .AttributeSet
-                    .Delete(new []{attributeId});
-            }
-            else
-            {
-                await this._domain
-                    .AttributeSet
-                    .Merge(items.Select((i, index) => new SgAttributeItem(i.Id ?? Guid.NewGuid(), attributeId, i.Title, index)).ToList());
-            }
+                if (items.Count < 1)
+                {
+                    await this._domain
+                        .AttributeSet
+                        .Delete(new[] { attributeId });
+                }
+                else
+                {
+                    await this._domain
+                        .AttributeSet
+                        .Merge(
+                            items.Select((i, index) => new SgAttributeItem(i.Id ?? Guid.NewGuid(), attributeId, i.Title, index))
+                                .ToList()
+                        );
+                }
 
-            tran.Commit();
+                await tran.CommitAsync();
+            }
 
             return ServiceResponse.Successful();
         }

@@ -1,4 +1,5 @@
 ﻿using System.Data.SqlClient;
+using System.Threading.Tasks;
 using SqExpress.DataAccess;
 using SqExpress.SqlExport;
 
@@ -21,14 +22,19 @@ namespace SqGoods.DomainLogic.DataAccess
                 sqlExporter: TSqlExporter.Default);
         }
 
-        public void OpenConnection()
+        public Task OpenConnectionAsync()
         {
-            this._connection.Open();
+            return this._connection.OpenAsync();
         }
 
         public void Dispose()
         {
-            this._connection.Dispose();
+            this._connection.DisposeAsync();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return this._connection.DisposeAsync();
         }
     }
 }

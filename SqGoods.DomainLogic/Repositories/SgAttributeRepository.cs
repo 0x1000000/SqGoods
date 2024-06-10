@@ -48,44 +48,55 @@ namespace SqGoods.DomainLogic.Repositories
         {
             var tbl = AllTables.GetAttribute();
 
-            using var tran = this._database.BeginTransactionOrUseExisting(out _);
+            var (tran, _) = await this._database.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
 
-            var attChangedType = await SqModelSelectBuilder.Select(SgAttributeTypeId.GetReader())
-                .Get(t => attributes.Select(a => a.Id == t.AttributeId & (int)a.Type != t.Type).JoinAsOr(),
-                    null,
-                    i => i)
-                .Query(this._database, (SingleValue: new List<Guid>(), Set: new List<Guid>()), (acc, next) =>
+
+                var attChangedType = await SqModelSelectBuilder.Select(SgAttributeTypeId.GetReader())
+                    .Get(
+                        t => attributes.Select(a => a.Id == t.AttributeId & (int)a.Type != t.Type).JoinAsOr(),
+                        null,
+                        i => i
+                    )
+                    .Query(
+                        this._database,
+                        (SingleValue: new List<Guid>(), Set: new List<Guid>()),
+                        (acc, next) =>
+                        {
+                            (next.Type == SgAttributeType.SubSet ? acc.Set : acc.SingleValue).Add(next.Id);
+                            return acc;
+                        }
+                    );
+
+                await UpdateData(tbl, attributes)
+                    .MapDataKeys(SgAttribute.GetUpdateKeyMapping)
+                    .MapData(SgAttribute.GetUpdateMapping)
+                    .Exec(this._database);
+
+                //Removing product values for attributes whose type have been changed
+                if (attChangedType.SingleValue.Count > 0)
                 {
-                    (next.Type == SgAttributeType.SubSet ? acc.Set : acc.SingleValue).Add(next.Id);
-                    return acc;
-                });
+                    var tblProductAttribute = AllTables.GetProductAttribute();
+                    await SqQueryBuilder.Delete(tblProductAttribute)
+                        .Where(tblProductAttribute.AttributeId.In(attChangedType.SingleValue))
+                        .Exec(this._database);
+                }
 
-            await UpdateData(tbl, attributes)
-                .MapDataKeys(SgAttribute.GetUpdateKeyMapping)
-                .MapData(SgAttribute.GetUpdateMapping)
-                .Exec(this._database);
+                if (attChangedType.Set.Count > 0)
+                {
+                    var tblProductAttributeSet = AllTables.GetProductAttributeSet();
+                    var tblAttSet = AllTables.GetAttributeSet();
 
-            //Removing product values for attributes whose type have been changed
-            if (attChangedType.SingleValue.Count > 0)
-            {
-                var tblProductAttribute = AllTables.GetProductAttribute();
-                await SqQueryBuilder.Delete(tblProductAttribute)
-                    .Where(tblProductAttribute.AttributeId.In(attChangedType.SingleValue))
-                    .Exec(this._database);
+                    await SqQueryBuilder.Delete(tblProductAttributeSet)
+                        .From(tblProductAttributeSet)
+                        .InnerJoin(tblAttSet, on: tblProductAttributeSet.AttributeSetId == tblAttSet.AttributeSetId)
+                        .Where(tblAttSet.AttributeId.In(attChangedType.Set))
+                        .Exec(this._database);
+                }
+
+                await tran.CommitAsync();
             }
-            if (attChangedType.Set.Count > 0)
-            {
-                var tblProductAttributeSet = AllTables.GetProductAttributeSet();
-                var tblAttSet = AllTables.GetAttributeSet();
-
-                await SqQueryBuilder.Delete(tblProductAttributeSet)
-                    .From(tblProductAttributeSet)
-                    .InnerJoin(tblAttSet, on: tblProductAttributeSet.AttributeSetId == tblAttSet.AttributeSetId)
-                    .Where(tblAttSet.AttributeId.In(attChangedType.Set))
-                    .Exec(this._database);
-            }
-
-            tran.Commit();
         }
 
         public async Task Delete(IReadOnlyList<Guid> attributes)
@@ -97,36 +108,38 @@ namespace SqGoods.DomainLogic.Repositories
             var tblProductAttribute = AllTables.GetProductAttribute();
             var tblProductAttributeSet = AllTables.GetProductAttributeSet();
 
-            using var tran = this._database.BeginTransactionOrUseExisting(out _);
+            var (tran, _) = await this._database.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
+                await SqQueryBuilder
+                    .Delete(tblProductAttribute)
+                    .Where(tblProductAttribute.AttributeId.In(attributes))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tblProductAttribute)
-                .Where(tblProductAttribute.AttributeId.In(attributes))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tblProductAttributeSet)
+                    .From(tblProductAttributeSet)
+                    .InnerJoin(tblSet, on: tblProductAttributeSet.AttributeSetId == tblSet.AttributeSetId)
+                    .Where(tblSet.AttributeId.In(attributes))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tblProductAttributeSet)
-                .From(tblProductAttributeSet)
-                .InnerJoin(tblSet, on: tblProductAttributeSet.AttributeSetId == tblSet.AttributeSetId)
-                .Where(tblSet.AttributeId.In(attributes))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tblSet)
+                    .Where(tblSet.AttributeId.In(attributes))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tblSet)
-                .Where(tblSet.AttributeId.In(attributes))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tblCat)
+                    .Where(tblCat.AttributeId.In(attributes))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tblCat)
-                .Where(tblCat.AttributeId.In(attributes))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tbl)
+                    .Where(tbl.AttributeId.In(attributes))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tbl)
-                .Where(tbl.AttributeId.In(attributes))
-                .Exec(this._database);
-
-            tran.Commit();
+                await tran.CommitAsync();
+            }
         }
 
         private class RelationFields : RelationFieldsBase<TblAttribute>, ISgAttributeRepository.IRelationFields

@@ -14,7 +14,7 @@ namespace SqGoods.DomainLogic.Tables
             this.AttributeId = this.CreateGuidColumn("AttributeId", ColumnMeta.PrimaryKey());
             this.Name = this.CreateStringColumn(name: "Name", size: 255, isUnicode: true, isText: false, columnMeta: null);
             this.Type = this.CreateInt16Column("Type", null);
-            this.Unit = this.CreateNullableStringColumn("Unit", size: 255, isUnicode: true);
+            this.Unit = this.CreateNullableStringColumn(name: "Unit", size: 255, isUnicode: true, isText: false, columnMeta: null);
         }
 
         [SqModel("SgAttribute", PropertyName = "Id")]

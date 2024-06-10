@@ -14,7 +14,7 @@ namespace SqGoods.DomainLogic.Tables
             this.AttributeSetId = this.CreateGuidColumn("AttributeSetId", ColumnMeta.PrimaryKey());
             this.AttributeId = this.CreateGuidColumn("AttributeId", ColumnMeta.ForeignKey<TblAttribute>(t => t.AttributeId));
             this.Name = this.CreateStringColumn(name: "Name", size: 255, isUnicode: true, isText: false, columnMeta: null);
-            this.Order = this.CreateInt32Column("Order");
+            this.Order = this.CreateInt32Column("Order", null);
             this.AddUniqueIndex(this.AttributeId, this.AttributeSetId);
         }
 

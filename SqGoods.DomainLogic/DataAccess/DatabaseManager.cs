@@ -29,7 +29,7 @@ namespace SqGoods.DomainLogic.DataAccess
     {
         private readonly SqlConnectionStorageFactory _connectionStorageFactory;
 
-        private readonly SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+        private readonly SemaphoreSlim _semaphore = new(1);
 
         public DomainLogicOptions Options => this._connectionStorageFactory.Options;
 
@@ -65,19 +65,19 @@ namespace SqGoods.DomainLogic.DataAccess
 
             try
             {
-                using var cs = this._connectionStorageFactory.CreateStorage();
+                await using var cs = this._connectionStorageFactory.CreateStorage();
 
                 try
                 {
-                    cs.OpenConnection();
+                    await cs.OpenConnectionAsync();
                 }
                 catch (Exception e)
                 {
                     this.LastError = new InitializationError(InitializationError.InitializationErrorCode.Connection, null, e);
                     return this.LastError;
                 }
-                
-                using var database = cs.CreateDatabase();
+
+                await using var database = cs.CreateDatabase();
 
                 var declaredTables = AllTables.BuildAllTableList();
 
@@ -108,8 +108,8 @@ namespace SqGoods.DomainLogic.DataAccess
 
         public async Task WriteDbJsonDataToStream(Stream stream, int? pendingBytesLimit)
         {
-            using var cs = this._connectionStorageFactory.CreateStorage();
-            using var database = cs.CreateDatabase();
+            await using var cs = this._connectionStorageFactory.CreateStorage();
+            await using var database = cs.CreateDatabase();
             await using var jsonWriter = new Utf8JsonWriter(stream, options: new JsonWriterOptions { Indented = true });
 
             var allTables = AllTables.BuildAllTableList();

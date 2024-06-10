@@ -124,7 +124,7 @@ namespace SqGoods.DomainLogic.Repositories.Utils
                     {
                         SgAttributeType.Boolean => tblProductAttribute.BoolValue,
                         SgAttributeType.Integer => tblProductAttribute.IntValue,
-                        SgAttributeType.Select => tblProductAttribute.SelectValue,
+                        SgAttributeType.Select => tblProductAttribute.GuidValue,
                         SgAttributeType.SubSet => throw new Exception("Set attributes require cannot be used here"),
                         _ => throw new ArgumentOutOfRangeException()
                     };

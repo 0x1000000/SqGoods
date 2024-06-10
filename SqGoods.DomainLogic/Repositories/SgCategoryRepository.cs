@@ -32,51 +32,57 @@ namespace SqGoods.DomainLogic.Repositories
 
         public async Task Create(IReadOnlyList<SgCategory> newCategories)
         {
-            using var transaction = this._database.BeginTransactionOrUseExisting(out _);
+            var (tran, _) = await this._database.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
+                var tblCategory = AllTables.GetCategory();
 
-            var tblCategory =  AllTables.GetCategory();
+                await InsertDataInto(tblCategory, newCategories)
+                    .MapData(SgCategory.GetMapping)
+                    .Exec(this._database);
 
-            await InsertDataInto(tblCategory, newCategories)
-                .MapData(SgCategory.GetMapping)
-                .Exec(this._database);
+                await this.UpdateOrder(newCategories, null);
 
-            await this.UpdateOrder(newCategories, null);
-
-            transaction.Commit();
+                await tran.CommitAsync();
+            }
         }
 
         public async Task Update<T>(ISqModelUpdaterKey<T, TblCategory> updater, IReadOnlyList<T> data)
             where T : ISgCategoryIdentity
         {
-            using var transaction = this._database.BeginTransactionOrUseExisting(out _);
-
-            TmpOrder? tmpOrder = null;
-
-            if (typeof(ISgCategoryOrder).IsAssignableFrom(typeof(T)))
+            var (tran, _) = await this._database.BeginTransactionOrUseExistingAsync();
+            await using (tran)
             {
-                tmpOrder = new TmpOrder();
+                TmpOrder? tmpOrder = null;
 
-                var cat = AllTables.GetCategory();
+                if (typeof(ISgCategoryOrder).IsAssignableFrom(typeof(T)))
+                {
+                    tmpOrder = new TmpOrder();
 
-                await this._database.Statement(tmpOrder.Script.Create());
+                    var cat = AllTables.GetCategory();
 
-                await InsertInto(tmpOrder, tmpOrder.CategoryId, tmpOrder.OldOrder, tmpOrder.OldTopOrder)
-                    .From(Select(cat.CategoryId, cat.Order, cat.TopOrder)
-                        .From(cat)
-                        .Where(cat.CategoryId.In(data.Select(i => i.Id).ToList())))
-                    .Exec(this._database);
+                    await this._database.Statement(tmpOrder.Script.Create());
+
+                    await InsertInto(tmpOrder, tmpOrder.CategoryId, tmpOrder.OldOrder, tmpOrder.OldTopOrder)
+                        .From(
+                            Select(cat.CategoryId, cat.Order, cat.TopOrder)
+                                .From(cat)
+                                .Where(cat.CategoryId.In(data.Select(i => i.Id).ToList()))
+                        )
+                        .Exec(this._database);
+                }
+
+                await QueryHelper.Update(this._database, data, updater, s => s.Set(s.Target.DateTimeUpdated, GetUtcDate()));
+
+                if (tmpOrder != null)
+                {
+                    await UpdateOrder((IReadOnlyList<ISgCategoryOrder>)data, tmpOrder);
+
+                    await this._database.Statement(tmpOrder.Script.Drop());
+                }
+
+                await tran.CommitAsync();
             }
-
-            await QueryHelper.Update(this._database, data, updater, s=>s.Set(s.Target.DateTimeUpdated, GetUtcDate()));
-
-            if (tmpOrder != null)
-            {
-                await UpdateOrder((IReadOnlyList<ISgCategoryOrder>) data, tmpOrder);
-
-                await this._database.Statement(tmpOrder.Script.Drop());
-            }
-
-            transaction.Commit();
         }
 
         public async Task Delete(IReadOnlyList<Guid> categoriesIds)
@@ -87,40 +93,43 @@ namespace SqGoods.DomainLogic.Repositories
             var tblProductAttribute = AllTables.GetProductAttribute();
             var tblProductAttributeSet = AllTables.GetProductAttributeSet();
 
-            using var tran = this._database.BeginTransactionOrUseExisting(out _);
+            var (tran, _) = await this._database.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
 
-            await SqQueryBuilder
-                .Delete(tblProductAttributeSet)
-                .From(tblProductAttributeSet)
-                .InnerJoin(tblProduct, on: tblProduct.ProductId == tblProductAttributeSet.ProductId)
-                .Where(tblProduct.CategoryId.In(categoriesIds))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tblProductAttributeSet)
+                    .From(tblProductAttributeSet)
+                    .InnerJoin(tblProduct, on: tblProduct.ProductId == tblProductAttributeSet.ProductId)
+                    .Where(tblProduct.CategoryId.In(categoriesIds))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tblProductAttribute)
-                .From(tblProductAttribute)
-                .InnerJoin(tblProduct, on: tblProduct.ProductId == tblProductAttribute.ProductId)
-                .Where(tblProduct.CategoryId.In(categoriesIds))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tblProductAttribute)
+                    .From(tblProductAttribute)
+                    .InnerJoin(tblProduct, on: tblProduct.ProductId == tblProductAttribute.ProductId)
+                    .Where(tblProduct.CategoryId.In(categoriesIds))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tblProduct)
-                .Where(tblProduct.CategoryId.In(categoriesIds))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tblProduct)
+                    .Where(tblProduct.CategoryId.In(categoriesIds))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tblCatAttr)
-                .Where(tblCatAttr.CategoryId.In(categoriesIds))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tblCatAttr)
+                    .Where(tblCatAttr.CategoryId.In(categoriesIds))
+                    .Exec(this._database);
 
-            await SqQueryBuilder
-                .Delete(tbl)
-                .Where(tbl.CategoryId.In(categoriesIds))
-                .Exec(this._database);
+                await SqQueryBuilder
+                    .Delete(tbl)
+                    .Where(tbl.CategoryId.In(categoriesIds))
+                    .Exec(this._database);
 
-            await this.UpdateOrder(null, null);
+                await this.UpdateOrder(null, null);
 
-            tran.Commit();
+                await tran.CommitAsync();
+            }
         }
 
         private async Task UpdateOrder(IReadOnlyList<ISgCategoryOrder>? newCategories, TmpOrder? oldOrder)

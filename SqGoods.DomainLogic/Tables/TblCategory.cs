@@ -17,10 +17,9 @@ namespace SqGoods.DomainLogic.Tables
             this.TopOrder = this.CreateNullableInt32Column("TopOrder", null);
             this.DateTimeCreated = this.CreateDateTimeColumn("DateTimeCreated", false, ColumnMeta.DefaultValue(SqQueryBuilder.GetUtcDate()));
             this.DateTimeUpdated = this.CreateDateTimeColumn("DateTimeUpdated", false, ColumnMeta.DefaultValue(SqQueryBuilder.GetUtcDate()));
-
-            this.AddIndex(this.DateTimeUpdated);
-            this.AddIndex(this.Order);
             this.AddIndex(this.TopOrder);
+            this.AddIndex(this.Order);
+            this.AddIndex(this.DateTimeUpdated);
         }
 
         [SqModel("SgCategoryName", PropertyName = "Id")]

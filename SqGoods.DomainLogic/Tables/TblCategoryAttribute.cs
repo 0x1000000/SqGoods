@@ -12,8 +12,8 @@ namespace SqGoods.DomainLogic.Tables
         {
             this.CategoryId = this.CreateGuidColumn("CategoryId", ColumnMeta.PrimaryKey().ForeignKey<TblCategory>(t => t.CategoryId));
             this.AttributeId = this.CreateGuidColumn("AttributeId", ColumnMeta.PrimaryKey().ForeignKey<TblAttribute>(t => t.AttributeId));
-            this.Order = this.CreateInt32Column("Order");
-            this.Mandatory = this.CreateBooleanColumn("Mandatory", ColumnMeta.DefaultValue(false));
+            this.Order = this.CreateInt32Column("Order", null);
+            this.Mandatory = this.CreateBooleanColumn("Mandatory", ColumnMeta.DefaultValue(0));
         }
 
         [SqModel("SgCategoryAttributeOrder")]

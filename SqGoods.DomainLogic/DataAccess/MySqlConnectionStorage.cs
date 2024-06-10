@@ -1,4 +1,5 @@
-﻿using MySqlConnector;
+﻿using System.Threading.Tasks;
+using MySqlConnector;
 using SqExpress.DataAccess;
 using SqExpress.SqlExport;
 
@@ -23,14 +24,19 @@ namespace SqGoods.DomainLogic.DataAccess
                 sqlExporter: PgSqlExporter);
         }
 
-        public void OpenConnection()
+        public Task OpenConnectionAsync()
         {
-            this._connection.Open();
+            return this._connection.OpenAsync();
         }
 
         public void Dispose()
         {
             this._connection.Dispose();
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            return this._connection.DisposeAsync();
         }
     }
 }

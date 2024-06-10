@@ -35,17 +35,19 @@ namespace SqGoods.DomainLogic.Repositories
                 return;
             }
 
-            using var transaction = this._database.BeginTransactionOrUseExisting(out _);
+            var (tran, _) = await this._database.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
+                var tbl = AllTables.GetCategoryAttribute();
 
-            var tbl = AllTables.GetCategoryAttribute();
+                await InsertDataInto(tbl, categoryAttributes)
+                    .MapData(s => SgCategoryAttributeMandatory.GetMapping(s).Set(tbl.Order, (s.Index + 1) * -1))
+                    .Exec(this._database);
 
-            await InsertDataInto(tbl, categoryAttributes)
-                .MapData(s => SgCategoryAttributeMandatory.GetMapping(s).Set(tbl.Order, (s.Index + 1) * -1))
-                .Exec(this._database);
+                await this.NormalizeOrder(categoryAttributes.Select(i => i.CategoryId).Distinct().ToList());
 
-            await this.NormalizeOrder(categoryAttributes.Select(i => i.CategoryId).Distinct().ToList());
-
-            transaction.Commit();
+                await tran.CommitAsync();
+            }
         }
 
         public async Task Merge(IReadOnlyCollection<SgCategoryAttributeMandatory> categoryAttributes)
@@ -55,64 +57,73 @@ namespace SqGoods.DomainLogic.Repositories
                 return;
             }
 
-            using var transaction = this._database.BeginTransactionOrUseExisting(out _);
+            var (tran, _) = await this._database.BeginTransactionOrUseExistingAsync();
+            await using (tran)
+            {
 
-            var tbl = AllTables.GetCategoryAttribute();
+                var tbl = AllTables.GetCategoryAttribute();
 
-            var allAttributes = categoryAttributes.Select(a => a.AttributeId).Distinct().ToList();
+                var allAttributes = categoryAttributes.Select(a => a.AttributeId).Distinct().ToList();
 
-            var newOrder = CustomColumnFactory.Int32("NewOrder");
+                var newOrder = CustomColumnFactory.Int32("NewOrder");
 
-            await MergeDataInto(tbl, categoryAttributes)
-                .MapDataKeys(SgCategoryAttributeMandatory.GetUpdateKeyMapping)
-                .MapData(SgCategoryAttributeMandatory.GetUpdateMapping)
-                .MapExtraData(m=>m.Set(newOrder, (m.Index+1)*-1))
-                .WhenMatchedThenUpdate()
-                .WhenNotMatchedByTargetThenInsert()
-                .AlsoInsert(m=>m.Set(m.Target.Order, newOrder.WithSource(m.SourceDataAlias)))
-                .WhenNotMatchedBySourceThenDelete(t => t.AttributeId.In(allAttributes))
-                .Done()
-                .Exec(this._database);
+                await MergeDataInto(tbl, categoryAttributes)
+                    .MapDataKeys(SgCategoryAttributeMandatory.GetUpdateKeyMapping)
+                    .MapData(SgCategoryAttributeMandatory.GetUpdateMapping)
+                    .MapExtraData(m => m.Set(newOrder, (m.Index + 1) * -1))
+                    .WhenMatchedThenUpdate()
+                    .WhenNotMatchedByTargetThenInsert()
+                    .AlsoInsert(m => m.Set(m.Target.Order, newOrder.WithSource(m.SourceDataAlias)))
+                    .WhenNotMatchedBySourceThenDelete(t => t.AttributeId.In(allAttributes))
+                    .Done()
+                    .Exec(this._database);
 
-            var allCategories = categoryAttributes.Select(a => a.CategoryId).Distinct().ToList();
-            await this.NormalizeOrder(allCategories);
+                var allCategories = categoryAttributes.Select(a => a.CategoryId).Distinct().ToList();
+                await this.NormalizeOrder(allCategories);
 
-            //Check orphan product attributes 
+                //Check orphan product attributes 
 
-            var tblProduct = AllTables.GetProduct();
-            var tblProductAttribute = AllTables.GetProductAttribute();
-            var tblProductAttributeSet = AllTables.GetProductAttributeSet();
-            var tblAttributeSet = AllTables.GetAttributeSet();
+                var tblProduct = AllTables.GetProduct();
+                var tblProductAttribute = AllTables.GetProductAttribute();
+                var tblProductAttributeSet = AllTables.GetProductAttributeSet();
+                var tblAttributeSet = AllTables.GetAttributeSet();
 
-            await Delete(tblProductAttribute)
-                .From(tblProductAttribute)
-                .InnerJoin(tblProduct, on: tblProduct.ProductId == tblProductAttribute.ProductId)
-                .Where(
-                    tblProductAttribute.AttributeId.In(allAttributes) &
-                    !Exists(
-                        SelectOne()
-                            .From(tbl)
-                            .Where(
-                                tbl.AttributeId == tblProductAttribute.AttributeId &
-                                tbl.CategoryId == tblProduct.CategoryId)))
-                .Exec(this._database);
+                await Delete(tblProductAttribute)
+                    .From(tblProductAttribute)
+                    .InnerJoin(tblProduct, on: tblProduct.ProductId == tblProductAttribute.ProductId)
+                    .Where(
+                        tblProductAttribute.AttributeId.In(allAttributes) &
+                        !Exists(
+                            SelectOne()
+                                .From(tbl)
+                                .Where(
+                                    tbl.AttributeId == tblProductAttribute.AttributeId &
+                                    tbl.CategoryId == tblProduct.CategoryId
+                                )
+                        )
+                    )
+                    .Exec(this._database);
 
-            await Delete(tblProductAttributeSet)
-                .From(tblProductAttributeSet)
-                .InnerJoin(tblProduct, on: tblProduct.ProductId == tblProductAttributeSet.ProductId)
-                .InnerJoin(tblAttributeSet, on: tblAttributeSet.AttributeSetId == tblProductAttributeSet.AttributeSetId)
-                .Where(
-                    tblAttributeSet.AttributeId.In(allAttributes) &
-                    !Exists(
-                        SelectOne()
-                            .From(tbl)
-                            .Where(
-                                tbl.AttributeId == tblAttributeSet.AttributeId &
-                                tbl.CategoryId == tblProduct.CategoryId)))
-                .Exec(this._database);
+                await Delete(tblProductAttributeSet)
+                    .From(tblProductAttributeSet)
+                    .InnerJoin(tblProduct, on: tblProduct.ProductId == tblProductAttributeSet.ProductId)
+                    .InnerJoin(tblAttributeSet, on: tblAttributeSet.AttributeSetId == tblProductAttributeSet.AttributeSetId)
+                    .Where(
+                        tblAttributeSet.AttributeId.In(allAttributes) &
+                        !Exists(
+                            SelectOne()
+                                .From(tbl)
+                                .Where(
+                                    tbl.AttributeId == tblAttributeSet.AttributeId &
+                                    tbl.CategoryId == tblProduct.CategoryId
+                                )
+                        )
+                    )
+                    .Exec(this._database);
 
 
-            transaction.Commit();
+                await tran.CommitAsync();
+            }
         }
 
         public async Task Update(IReadOnlyCollection<SgCategoryAttributeOrder> categoryAttributes)

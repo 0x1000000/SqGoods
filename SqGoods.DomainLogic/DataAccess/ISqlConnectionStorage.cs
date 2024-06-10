@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Threading.Tasks;
 using SqExpress.DataAccess;
 
 namespace SqGoods.DomainLogic.DataAccess
 {
-    internal interface ISqlConnectionStorage : IDisposable
+    internal interface ISqlConnectionStorage : IDisposable, IAsyncDisposable
     {
         ISqDatabase CreateDatabase();
 
-        void OpenConnection();
+        Task OpenConnectionAsync();
     }
 }

@@ -43,7 +43,7 @@ namespace SqGoods.Services
             ExprBoolean? extraFilter = null;
             if (extraFilterModel != null)
             {
-                string? error = null;
+                string? error;
                 (extraFilter, error) = extraFilterModel.Accept(FilterBoolModelMapper.Instance);
                 if (error != null)
                 {
@@ -71,7 +71,7 @@ namespace SqGoods.Services
 
             var selectEnum = productAttributeRawValues
                 .Where(pv => attributes[pv.Key.AttributeId].Type == SgAttributeType.Select)
-                .Select(pv => pv.Value.SelectValue ?? throw new Exception("Select value is expected here"));
+                .Select(pv => pv.Value.GuidValue ?? throw new Exception("Select value is expected here"));
             var allSetIds = productAttributeSetValues.Values.SelectMany(i=>i).Concat(selectEnum).Distinct().ToList();
             var setItemNames = allSetIds.Count < 1
                 ? new Dictionary<Guid, string>(0)
@@ -136,7 +136,7 @@ namespace SqGoods.Services
                         .QueryDict(database, i => (i.Id, i));
             }
 
-            async Task<Dictionary<(Guid ProductId, Guid AttributeId), SgProductAttribute>> GetProductAttributeRawValues(ISqDatabase database, IReadOnlyList<Guid> attributesIds, List<Guid> productIds)
+            static async Task<Dictionary<(Guid ProductId, Guid AttributeId), SgProductAttribute>> GetProductAttributeRawValues(ISqDatabase database, IReadOnlyList<Guid> attributesIds, List<Guid> productIds)
             {
                 return attributesIds.Count < 1 || productIds.Count < 1
                     ? new Dictionary<(Guid ProductId, Guid AttributeId), SgProductAttribute>(0)
@@ -146,7 +146,7 @@ namespace SqGoods.Services
                         .QueryDict(database, i => ((i.ProductId, i.AttributeId), i));
             }
 
-            async Task<Dictionary<(Guid ProductId, Guid AttributeId), ICollection<Guid>>> GetProductAttributeSetValues(ISqDatabase database, IReadOnlyList<Guid> attributesIds, IReadOnlyList<Guid> productIds)
+            static async Task<Dictionary<(Guid ProductId, Guid AttributeId), ICollection<Guid>>> GetProductAttributeSetValues(ISqDatabase database, IReadOnlyList<Guid> attributesIds, IReadOnlyList<Guid> productIds)
             {
                 return attributesIds.Count < 1 || productIds.Count < 1
                     ? new Dictionary<(Guid ProductId, Guid AttributeId), ICollection<Guid>>(0)
@@ -278,22 +278,26 @@ namespace SqGoods.Services
                 return ServiceResponse.Error(ServiceErrorCode.BadRequest, "Empty list");
             }
 
-            using var tran = this._domain.Db.BeginTransaction();
-
-            var ids = updateModels.SelectReadOnlyList(m=>m.Id);
-
-            await this._domain.Product.Update(
-                updateModels
-                    .Select(m => new SgProduct(m.Id, m.CategoryId, m.Name, m.ImageUrl))
-                    .ToList());
-
-            var resp = await this.UpdateProductAttributes(updateModels, ids);
-            if (resp != null)
+            var (tran, _) = await this._domain.Db.BeginTransactionOrUseExistingAsync();
+            await using (tran)
             {
-                return resp;
-            }
 
-            tran.Commit();
+                var ids = updateModels.SelectReadOnlyList(m => m.Id);
+
+                await this._domain.Product.Update(
+                    updateModels
+                        .Select(m => new SgProduct(m.Id, m.CategoryId, m.Name, m.ImageUrl))
+                        .ToList()
+                );
+
+                var resp = await this.UpdateProductAttributes(updateModels, ids);
+                if (resp != null)
+                {
+                    return resp;
+                }
+
+                await tran.CommitAsync();
+            }
 
             return ServiceResponse.Successful();
         }
@@ -305,21 +309,25 @@ namespace SqGoods.Services
                 return ServiceResponse.Error(ServiceErrorCode.BadRequest, "Empty list");
             }
 
-            using var tran = this._domain.Db.BeginTransaction();
-
-            var ids = createModels.Select(_ => Guid.NewGuid()).ToList();
-
-            await this._domain.Product.Create(createModels
-                .Select((m,index) => new SgProduct(ids[index], m.CategoryId, m.Name, m.ImageUrl))
-                .ToList());
-
-            var resp = await this.UpdateProductAttributes(createModels, ids);
-            if (resp != null)
+            var (tran, _) = await this._domain.Db.BeginTransactionOrUseExistingAsync();
+            await using (tran)
             {
-                return resp;
-            }
+                var ids = createModels.Select(_ => Guid.NewGuid()).ToList();
 
-            tran.Commit();
+                await this._domain.Product.Create(
+                    createModels
+                        .Select((m, index) => new SgProduct(ids[index], m.CategoryId, m.Name, m.ImageUrl))
+                        .ToList()
+                );
+
+                var resp = await this.UpdateProductAttributes(createModels, ids);
+                if (resp != null)
+                {
+                    return resp;
+                }
+
+                await tran.CommitAsync();
+            }
 
             return ServiceResponse.Successful();
         }
@@ -502,7 +510,7 @@ namespace SqGoods.Services
                     stringValue: null,
                     intValue: null,
                     boolValue: value,
-                    selectValue: null);
+                    guidValue: null);
             }
 
             public SgProductAttribute? CaseInteger()
@@ -518,7 +526,7 @@ namespace SqGoods.Services
                     stringValue: null,
                     intValue: value,
                     boolValue: null,
-                    selectValue: null);
+                    guidValue: null);
             }
 
             public SgProductAttribute? CaseSelect()
@@ -534,7 +542,7 @@ namespace SqGoods.Services
                     stringValue: null,
                     intValue: null,
                     boolValue: null,
-                    selectValue: value);
+                    guidValue: value);
             }
 
             public SgProductAttribute CaseSubset()
@@ -564,7 +572,7 @@ namespace SqGoods.Services
 
             public string CaseSelect()
             {
-                return (this._attributeValue.SelectValue ?? throw new Exception("Guid value is expected")).ToString();
+                return (this._attributeValue.GuidValue ?? throw new Exception("Guid value is expected")).ToString();
             }
 
             public string CaseSubset()
@@ -596,7 +604,7 @@ namespace SqGoods.Services
 
             public string CaseSelect()
             {
-                var id = this._attributeValue.SelectValue ?? throw new Exception("Guid value is expected");
+                var id = this._attributeValue.GuidValue ?? throw new Exception("Guid value is expected");
                 if (!this._itemSetNames.TryGetValue(id, out var name))
                 {
                     throw new Exception("Could not find attribute set item: " + id);
