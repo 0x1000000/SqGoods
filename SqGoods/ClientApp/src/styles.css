@@ -1,6 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
+html,
 body {
-  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  /* Disable scrolling on the body */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
@@ -9,14 +18,27 @@ body {
   text-align: left;
 }
 
-a *{
+a * {
   color: initial;
 }
 
-#app-content-root{
-  max-width: 1200px;
+app-root {
+  display: flex;
   text-align: initial;
   margin: auto;
+  height: 100vh;
+  overflow-y: scroll;
+}
+
+#app-content-root {
+  flex: 0 1 1200px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 20px;
+}
+
+.app-left-right {
+  flex: 1;
 }
 
 .disable-text-selection {
@@ -28,13 +50,14 @@ a *{
   user-select: none;
 }
 
-.tab-link{
+.tab-link {
   display: block;
   text-decoration: initial;
   height: 50px;
   padding: 0 10px;
 }
-.tab-link:visited{
+
+.tab-link:visited {
   color: initial;
 }
 
@@ -70,7 +93,7 @@ a *{
   --sq-t-border-color-hover: #d9d9d9;
 }
 
-.icon{
+.icon {
   fill: var(--sq-t-color-opposite);
   stroke: var(--sq-t-color-opposite);
   height: 25px;
@@ -93,12 +116,14 @@ a *{
   padding: .375rem .75rem;
   font-size: 1rem;
   border-radius: .25rem;
-  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
-.btn + .btn{
+
+.btn+.btn {
   margin-left: 5px;
 }
-.btn *{
+
+.btn * {
   vertical-align: middle;
 }
 
@@ -106,7 +131,7 @@ a *{
   background-color: var(--sq-t-secondary-select-color-hover);
 }
 
-.btn:focus{
+.btn:focus {
   box-shadow: var(--sq-t-secondary-select-box-shadow);
   outline: 0;
 }
@@ -117,15 +142,15 @@ a *{
   color: var(--sq-t-primary-select-color-opposite);
 }
 
-.btn-primary:hover{
+.btn-primary:hover {
   background-color: var(--sq-t-primary-select-color-hover);
 }
 
-.btn-primary:focus{
-  box-shadow: var(--sq-t-primary-select-box-shadow);  
+.btn-primary:focus {
+  box-shadow: var(--sq-t-primary-select-box-shadow);
 }
 
-.btn-primary svg{
+.btn-primary svg {
   fill: var(--sq-t-primary-select-color-opposite);
   stroke: var(--sq-t-primary-select-color-opposite);
   height: 1.5rem;
@@ -138,7 +163,7 @@ a *{
   color: var(--sq-t-secondary-select-color-opposite);
 }
 
-.btn-secondary svg{
+.btn-secondary svg {
   fill: var(--sq-t-secondary-select-color-opposite);
   stroke: var(--sq-t-secondary-select-color-opposite);
   height: 1.5rem;
@@ -151,13 +176,14 @@ a *{
   padding: .15rem;
 }
 
-button:disabled,button:disabled:hover{
+button:disabled,
+button:disabled:hover {
   background-color: var(--sq-t-disabled-color);
   color: var(--sq-t-disabled-color-opposite);
   cursor: default;
 }
 
-input{
+input {
   display: inline-block;
   padding: .375rem;
   width: 250px;
@@ -166,10 +192,10 @@ input{
   background-color: var(--sq-t-color);
   color: var(--sq-t-color-opposite);
   background-clip: padding-box;
-  box-sizing:border-box;
+  box-sizing: border-box;
   border: 1px solid var(--sq-t-border-color);
   border-radius: .25rem;
-  transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 input:focus {
@@ -182,11 +208,11 @@ input.error {
   border-color: var(--sq-t-error-color);
 }
 
-input:disabled{
+input:disabled {
   background-color: var(--sq-t-disabled-color);
   color: var(--sq-t-disabled-color-opposite);
 }
 
-input.error:focus{
+input.error:focus {
   box-shadow: var(--sq-t-error-box-shadow);
 }
