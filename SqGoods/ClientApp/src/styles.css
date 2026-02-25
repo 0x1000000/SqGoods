@@ -14,8 +14,11 @@ body {
   font-weight: 400;
   line-height: 1.5;
   color: var(--sq-t-color-opposite);
-  background-color: var(--sq-t-color);
   text-align: left;
+  background:
+    radial-gradient(circle at 12% 14%, rgba(63, 81, 181, 0.18), transparent 34%),
+    radial-gradient(circle at 88% 8%, rgba(0, 150, 136, 0.16), transparent 30%),
+    linear-gradient(150deg, #eef2fa 0%, #f7f9fd 58%, #f2f6fb 100%);
 }
 
 a * {
@@ -27,7 +30,8 @@ app-root {
   text-align: initial;
   margin: auto;
   height: 100vh;
-  overflow-y: scroll;
+  overflow-y: auto;
+  align-items: flex-start;
 }
 
 #app-content-root {
@@ -35,6 +39,13 @@ app-root {
   max-width: 1200px;
   width: 100%;
   margin: 20px;
+  min-height: calc(100vh - 40px);
+  align-self: flex-start;
+  padding: 10px 12px 14px;
+  border: 1px solid var(--sq-t-border-color-hover);
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.9);
+  box-sizing: border-box;
 }
 
 .app-left-right {
@@ -215,4 +226,15 @@ input:disabled {
 
 input.error:focus {
   box-shadow: var(--sq-t-error-box-shadow);
+}
+
+@media (max-width: 768px) {
+  .app-left-right {
+    display: none;
+  }
+
+  #app-content-root {
+    margin: 8px;
+    min-height: calc(100vh - 16px);
+  }
 }

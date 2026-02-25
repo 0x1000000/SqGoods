@@ -12,10 +12,18 @@
     <ng-content select="sq-tabs-right-area"></ng-content>
   </sq-tabs-right-area>
 </sq-tabs>
-<router-outlet (activate)="activatedComponent = $event"></router-outlet>
+<div class="rt-content" [@routeTransition]="routeAnimationState">
+  <router-outlet (activate)="onRouteActivate($event)"></router-outlet>
+</div>
 <style>
   sq-tabs{
     display: block;
     margin-bottom: 10px;;
+  }
+
+  .rt-content {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
   }
 </style>

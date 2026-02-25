@@ -3,7 +3,13 @@
   <sq-app-progress-indicator></sq-app-progress-indicator>
   <sq-app-router-tabs>
     <sq-tabs-left-area>
-      <img id="logo" src="/assets/images/Logo.png"/>
+      <div id="brand-container">
+        <img id="logo" src="/assets/images/Logo.png"/>
+        <div id="brand-text">
+          <div id="brand-title">SqGoods</div>
+          <div id="brand-subtitle">Catalog Studio</div>
+        </div>
+      </div>
     </sq-tabs-left-area>
     <sq-tabs-right-area>
       <div id="user-profile-container">
@@ -16,27 +22,3 @@
 </div>
 <div class="app-left-right"></div>
 <sq-app-popups></sq-app-popups>
-<style>
-
-  #main-tabs {
-    margin-bottom: 20px;
-
-  }
-  #logo{
-    vertical-align: middle;
-    margin-right: 20px;
-    margin-left: 5px;
-    height: 47px;
-  }
-
-  #user-profile-container{
-    float: right;
-    height: 50px;
-    margin-right: 10px;
-  }
-
-  #user-profile-container svg{
-    height: 50px;
-    width: 35px;
-  }
-</style>

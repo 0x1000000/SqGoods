@@ -1,5 +1,6 @@
+import { animate, query, style, transition, trigger } from '@angular/animations';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input } from '@angular/core';
-import { ActivatedRoute, Router, Routes, UrlSegment } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, Routes, UrlSegment } from '@angular/router';
 import { ComponentState, ComponentStateDiff, initializeStateTracking, With } from 'ng-set-state';
 
 type TabData = {
@@ -14,12 +15,25 @@ type NewState = ComponentStateDiff<RouterTabsComponent>;
 @Component({
   selector: 'sq-app-router-tabs',
   templateUrl: './router-tabs.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  animations: [
+    trigger('routeTransition', [
+      transition('* <=> *', [
+        query(':leave', [
+          style({opacity: 1, transform: 'translateY(0)'}),
+          animate('120ms ease-in', style({opacity: 0, transform: 'translateY(8px)'}))
+        ], {optional: true}),
+        query(':enter', [
+          style({opacity: 0, transform: 'translateY(8px)'}),
+          animate('220ms cubic-bezier(.22,.61,.36,1)', style({opacity: 1, transform: 'translateY(0)'}))
+        ], {optional: true})
+      ])
+    ])
+  ]
 })
 export class RouterTabsComponent {
-
-  constructor(public router: Router, cd: ChangeDetectorRef, activatedRoute: ActivatedRoute) {
-    initializeStateTracking(this, {onStateApplied: () => cd.detectChanges()});
+  constructor(public router: Router, private readonly _cd: ChangeDetectorRef, activatedRoute: ActivatedRoute) {
+    initializeStateTracking(this, {onStateApplied: () => this._cd.detectChanges()});
     const self = this;
     activatedRoute.url.subscribe(u => {
       let diff = false;
@@ -39,6 +53,13 @@ export class RouterTabsComponent {
         self.path = u;
       }
     });
+
+    this.router.events.subscribe(e => {
+      if (e instanceof NavigationEnd){
+        this.routeAnimationState++;
+        this._cd.markForCheck();
+      }
+    });
   }
 
   @Input()
@@ -49,6 +70,8 @@ export class RouterTabsComponent {
   selectedTabId = '';
 
   activatedComponent: any = null;
+
+  routeAnimationState = 0;
 
   @With('path', 'router')
   static buildTabs(state: State): NewState {
@@ -103,6 +126,13 @@ export class RouterTabsComponent {
   }
 
   onLinkClick(url: string): void{
+    if (this.router.url === url){
+      return;
+    }
     this.router.navigateByUrl(url);
+  }
+
+  onRouteActivate(component: any): void {
+    this.activatedComponent = component;
   }
 }

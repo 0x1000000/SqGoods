@@ -1,22 +1,28 @@
 <nav class="st-tabs-bar">
-  <ng-content select="sq-tabs-left-area"></ng-content>
-  <ng-container *ngFor="let pane of panes;let i = index">
-    <sq-tab-label
-      *ngIf="!pane.href"
-      draggable="false"
-      [pane]="pane"
-      [index]="i"
-      (click)=onTabLabelClick(pane)
-    ></sq-tab-label>
-    <a *ngIf="pane.href" [attr.href]="pane.href" (click)="onLinkClick($event, pane)" draggable="false">
-      <sq-tab-label        
+  <div class="st-side st-left">
+    <ng-content select="sq-tabs-left-area"></ng-content>
+  </div>
+  <div class="st-main">
+    <ng-container *ngFor="let pane of panes;let i = index">
+      <sq-tab-label
+        *ngIf="!pane.href"
+        draggable="false"
         [pane]="pane"
         [index]="i"
-      ></sq-tab-label>  
-    </a>
-  </ng-container>
-  <div *ngIf="inkPosition" class="st-ink-bar" [style.left.px]="inkPosition[0]" [style.width.px]="inkPosition[1]"></div>
-  <ng-content select="sq-tabs-right-area"></ng-content>
+        (click)=onTabLabelClick(pane)
+      ></sq-tab-label>
+      <a *ngIf="pane.href" [attr.href]="pane.href" (click)="onLinkClick($event, pane)" draggable="false">
+        <sq-tab-label        
+          [pane]="pane"
+          [index]="i"
+        ></sq-tab-label>  
+      </a>
+    </ng-container>
+    <div *ngIf="inkPosition" class="st-ink-bar" [style.left.px]="inkPosition[0]" [style.width.px]="inkPosition[1]"></div>
+  </div>
+  <div class="st-side st-right">
+    <ng-content select="sq-tabs-right-area"></ng-content>
+  </div>
 </nav>
 <ng-content>
 
@@ -29,6 +35,35 @@
   .st-tabs-bar{
     white-space: nowrap;
     position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .st-side {
+    display: flex;
+    align-items: center;
+    height: 50px;
+    flex: 0 0 auto;
+  }
+
+  .st-left {
+    margin-right: 2px;
+  }
+
+  .st-main {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .st-main a {
+    text-decoration: none;
+  }
+
+  .st-right {
+    margin-left: auto;
   }
 
   .st-ink-bar {
@@ -38,5 +73,5 @@
     height: 2px;
     background-color: var(--sq-t-primary-select-color);
     transition: .3s cubic-bezier(.35,0,.25,1);
-}
+  }
 </style>
