@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --proxy-config proxy.conf.json",
-    "build": "ng build",
+    "build": "npm run build:dist",
+    "build:dist": "ng build --configuration production --output-path dist/SqGoods --delete-output-path true",
     "build:ssr": "ng run SqGoods:server:dev",
     "test": "ng test",
     "lint": "ng lint",

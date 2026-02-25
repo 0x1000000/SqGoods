@@ -6,8 +6,7 @@ SqGoods it is a catalog of products with dynamic attributes.
 The key feature is a complex filtering (any kind of boolean expressions) using the dynamic attributes. 
 
 ## Prerequisites
-- [.Net 6 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
-- NodeJS
+- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
 - MSSQL or MYSQL or PostgreSQL server (you will need to create an empty database)
 ## Configuration
 In ```<Code Root>/SqGoods/appsettings.json``` update the following attributes
@@ -19,7 +18,16 @@ In ```<Code Root>/SqGoods/appsettings.json``` update the following attributes
 ## Running
 1. go to  ```<Code Root>/SqGoods```
 2. run ```dotnet run```
-3. Open ```http://localhost:55242``` in a browser  
+3. Open ```https://localhost:7042``` in a browser
+
+The repository includes prebuilt production SPA assets under `SqGoods/ClientApp/dist`, so `dotnet run` does not require npm/node.
+
+If you need to rebuild frontend assets manually:
+1. go to ```<Code Root>/SqGoods/ClientApp```
+2. run ```npm install```
+3. run ```npm run build```
+
+`npm run build` is configured to regenerate only production assets under `SqGoods/ClientApp/dist/SqGoods`.
 
 ## What the Application does
 SqGoods is a catalog of products divided into different categories with their own attributes.
